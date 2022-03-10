@@ -9,6 +9,15 @@ module.exports.readPostAll = (req, res) => {
     else console.log("Error to get data :" + err);
   }).sort({ createdAt: -1 });
 };
+module.exports.readPostOne = (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknown : " + req.params.id);
+
+  PostModel.findById(req.params.id, (err, docs) => {
+    if (!err) res.send(docs);
+    else console.log("ID unknown : " + err);
+  }).select("-password, -_id");
+}
 
 module.exports.createPost = async (req, res) => {
   const { posterId, title, description, city, country } = req.body;
@@ -54,12 +63,12 @@ module.exports.deletePost = async (req, res) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
-module.exports.likePost = async (req, res) => {
+module.exports.likePost =   (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await PostModel.findOneAndUpdate(
+    PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $addToSet: { likers: req.body.id },
@@ -69,7 +78,7 @@ module.exports.likePost = async (req, res) => {
         if (!err) return res.status(400).send(err);
       }
     );
-    await UserModel.findOneAndUpdate(
+    UserModel.findByIdAndUpdate(
       req.body.id,
       { $addToSet: { likes: req.params.id } },
       { new: true },
@@ -87,7 +96,7 @@ module.exports.unlikePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    await PostModel.findOneAndUpdate(
+   await PostModel.findbyIdAndUpdate(
       req.params.id,
       {
         $pull: { likers: req.body.id },
@@ -97,7 +106,7 @@ module.exports.unlikePost = async (req, res) => {
         if (!err) return res.status(400).send(err);
       }
     );
-    await UserModel.findOneAndUpdate(
+     await UserModel.findByIdAndUpdate(
       req.body.id,
       { $pull: { likes: req.params.id } },
       { new: true },
@@ -111,12 +120,12 @@ module.exports.unlikePost = async (req, res) => {
   }
 };
 
-module.exports.commentPost = async (req, res) => {
+module.exports.commentPost =  (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return PostModel.findOneAndUpdate(
+    return PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $push: {
@@ -130,7 +139,8 @@ module.exports.commentPost = async (req, res) => {
       },
       { new: true },
       (err, docs) => {
-        if (!err) return res.send(docs).exec();
+        
+        if (!err) return res.send(docs.comments).exec();
         else return res.status(400).send(err);
       }
     );
@@ -139,34 +149,36 @@ module.exports.commentPost = async (req, res) => {
   }
 };
 
-// module.exports.editCommentPost = async (req, res) => {
-//   if (!ObjectID.isValid(req.params.id))
-//     return res.status(400).send("ID unknown : " + req.params.id);
+module.exports.editCommentPost =  (req, res) => {
+  if (!ObjectID.isValid(req.params.id))
+    return res.status(400).send("ID unknown : " + req.params.id);
 
-//   try {
-//     return PostModel.findOne(req.params.id, (err, docs) => {
-//       const theComment = docs.comments.find((comment) =>
-//         comment._id.equals(req.body.commentId)
-//       );
+  try {
+    return PostModel.findById(
+      req.params.id, 
+      (err, docs) => {
+      const theComment = docs.comments.find((comment) =>
+        comment._id.equals(req.body.commentId)
+      );
 
-//       if (!theComment) return res.status(404).send("Comment not found");
-//       theComment.text = req.body.text;
+      if (!theComment) return res.status(404).send("Comment not found");
+      theComment.text = req.body.text;
 
-//       return docs.save((err) => {
-//         if (!err) return res.status(200).send(docs);
-//         return res.status(500).send(err);
-//       });
-//     });
-//   } catch (err) {
-//     return res.status(400).send(err);
-//   }
-// };
+      return docs.save((err) => {
+        if (!err) return res.status(200).send(docs);
+        return res.status(500).send(err);
+      });
+    });
+  } catch (err) {
+    return res.status(400).send(err);
+  }
+};
 
-module.exports.deleteCommentPost = async (req, res) => {
+module.exports.deleteCommentPost =  (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
   try {
-    return PostModel.findByIdAndDelete(
+    return PostModel.findByIdAndUpdate(
       req.params.id,
       {
         $pull: {

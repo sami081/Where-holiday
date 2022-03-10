@@ -26,6 +26,9 @@ const userSchema = new mongoose.Schema(
       max: 1024,
       minlength: 6,
     },
+    picture : {
+      type : String
+    },
     likes : {
       type:[String]
     }

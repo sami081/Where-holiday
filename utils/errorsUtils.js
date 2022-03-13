@@ -33,7 +33,8 @@ module.exports.uploadErrors = (err) => {
   if (err.message.includes("invalid file"))
     errors.format = "format incompatible";
 
-  if (err.message.includes("max size")) errors.maxSize = "Image trop grande";
+  if (err.message.includes("max size")) 
+  errors.maxSize = "Image trop grande";
 
   return errors;
 };

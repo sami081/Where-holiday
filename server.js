@@ -2,7 +2,9 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const cookieParser = require("cookie-parser");
 const userRoutes = require("./routes/userRoutes");
-const postRoutes = require('./routes/postRoutes')
+const postRoutes = require("./routes/postRoutes");
+const path = require("path");
+
 
 require("dotenv").config({ path: "./config/.env" });
 require("./config/db");
@@ -12,6 +14,7 @@ const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use(express.static(path.join(__dirname, "public")));
 
 //jwt
 app.get("*", checkUser);
@@ -22,6 +25,7 @@ app.get("/jwtid", requireAuth, (req, res) => {
 //routes
 app.use("/api/user", userRoutes);
 app.use("/api/post", postRoutes);
+
 
 //server
 app.listen(process.env.PORT, () => {

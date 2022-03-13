@@ -1,7 +1,20 @@
-const postModel = require("../models/postModel");
 const PostModel = require("../models/postModel");
 const UserModel = require("../models/userModel");
+const { uploadErrors } = require("../utils/errorsUtils");
 const ObjectID = require("mongoose").Types.ObjectId;
+const multer = require("multer");
+
+
+const Storage = multer.diskStorage({
+  destination : './client/public/uploads/imagesPost',
+  filename:(req, file, cb) => {
+    cb(null, file.originalname)
+  },
+});
+const upload = multer({
+  storage :Storage
+}).single("testImage")
+
 
 module.exports.readPostAll = (req, res) => {
   PostModel.find((err, docs) => {
@@ -17,40 +30,60 @@ module.exports.readPostOne = (req, res) => {
     if (!err) res.send(docs);
     else console.log("ID unknown : " + err);
   }).select("-password, -_id");
-}
+};
 
 module.exports.createPost = async (req, res) => {
-  const { posterId, title, description, city, country } = req.body;
+  upload(req, res, (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const newPost = new PostModel({
+        posterId: req.body.posterId,
+        title: req.body.title,
+        description: req.body.description,
+        city: req.body.city,
+        country: req.body.country,
+        images: {
+          data: req.file.filename,
+          contentType: "image/png",
+        },
+      });
+      newPost
+        .save()
+        .then(() => res.send("succesfully uploaded"))
+        .catch((err) => console.log(err));
+    }
+  });
+  // const { posterId, title, description, city, country } = req.body;
 
-  try {
-    const post = await PostModel.create({
-      posterId,
-      title,
-      description,
-      city,
-      country,
-    });
-    return res.status(201).json(post);
-  } catch (err) {
-    return res.status(400).send(err);
-  }
+  // try {
+  //   const post = await PostModel.create({
+  //     posterId,
+  //     title,
+  //     description,
+  //     city,
+  //     country,
+  //   });
+  //   return res.status(201).json(post);
+  // } catch (err) {
+  //   return res.status(400).send(err);
+  // }
 };
 
 module.exports.modifyPost = async (req, res) => {
   PostModel.updateOne(
     { _id: req.params.id },
     { ...req.body, _id: req.params.id }
-  ) 
+  )
     .then(() => res.status(200).send(req.body))
     .catch((error) => res.status(400).json({ error }));
 };
 module.exports.modifyComment = (req, res) => {
   PostModel.updateOne(
     { _id: req.params.id },
-    { ...req.body, _id: req.params.id },
-   
+    { ...req.body, _id: req.params.id }
   )
-  
+
     .then(() => res.status(200).send(req.body))
     .catch((error) => res.status(400).json({ error }));
 };
@@ -63,7 +96,7 @@ module.exports.deletePost = async (req, res) => {
     .catch((error) => res.status(400).json({ error }));
 };
 
-module.exports.likePost =   (req, res) => {
+module.exports.likePost = (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
@@ -96,7 +129,7 @@ module.exports.unlikePost = async (req, res) => {
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-   await PostModel.findbyIdAndUpdate(
+    await PostModel.findbyIdAndUpdate(
       req.params.id,
       {
         $pull: { likers: req.body.id },
@@ -106,7 +139,7 @@ module.exports.unlikePost = async (req, res) => {
         if (!err) return res.status(400).send(err);
       }
     );
-     await UserModel.findByIdAndUpdate(
+    await UserModel.findByIdAndUpdate(
       req.body.id,
       { $pull: { likes: req.params.id } },
       { new: true },
@@ -120,7 +153,7 @@ module.exports.unlikePost = async (req, res) => {
   }
 };
 
-module.exports.commentPost =  (req, res) => {
+module.exports.commentPost = (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
@@ -139,7 +172,6 @@ module.exports.commentPost =  (req, res) => {
       },
       { new: true },
       (err, docs) => {
-        
         if (!err) return res.send(docs.comments).exec();
         else return res.status(400).send(err);
       }
@@ -149,14 +181,12 @@ module.exports.commentPost =  (req, res) => {
   }
 };
 
-module.exports.editCommentPost =  (req, res) => {
+module.exports.editCommentPost = (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
 
   try {
-    return PostModel.findById(
-      req.params.id, 
-      (err, docs) => {
+    return PostModel.findById(req.params.id, (err, docs) => {
       const theComment = docs.comments.find((comment) =>
         comment._id.equals(req.body.commentId)
       );
@@ -174,7 +204,7 @@ module.exports.editCommentPost =  (req, res) => {
   }
 };
 
-module.exports.deleteCommentPost =  (req, res) => {
+module.exports.deleteCommentPost = (req, res) => {
   if (!ObjectID.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
   try {
@@ -196,4 +226,4 @@ module.exports.deleteCommentPost =  (req, res) => {
   } catch (err) {
     return res.status(400).send(err);
   }
-}; 
+};

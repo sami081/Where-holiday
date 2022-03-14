@@ -8,16 +8,16 @@ const mongoose = require('mongoose')
 const ObjectID = require("mongoose").Types.ObjectId;
 
 
-//storage
-const Storage = multer.diskStorage({
-  destination : 'uploads',
-  filename:(req, file, cb) => {
-    cb(null, file.originalname)
-  },
-});
-const upload = multer({
-  storage :Storage
-}).single("testImage")
+// //storage
+// const Storage = multer.diskStorage({
+//   destination : 'uploads',
+//   filename:(req, file, cb) => {
+//     cb(null, file.originalname)
+//   },
+// });
+// const upload = multer({
+//   storage :Storage
+// }).single("testImage")
 
 router.get("/", postController.readPostAll);
 router.get("/:id", postController.readPostOne);

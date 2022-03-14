@@ -11,14 +11,12 @@ const PostSchema = new mongoose.Schema({
     maxlength: 100,
     trimp: true,
   },
- images: {
-   data:Buffer,
-   contentType: String
-    // required : true
-  },
-  video :{
-    type : String
-  },
+ images:{ 
+   type :String,
+   required : true
+
+},
+  
   description: {
     type: String,
     maxlength: 500,

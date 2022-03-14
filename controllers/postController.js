@@ -3,18 +3,26 @@ const UserModel = require("../models/userModel");
 const { uploadErrors } = require("../utils/errorsUtils");
 const ObjectID = require("mongoose").Types.ObjectId;
 const multer = require("multer");
+const fs = require ('fs')
 
 
+//stokage image
 const Storage = multer.diskStorage({
-  destination : './client/public/uploads/imagesPost',
-  filename:(req, file, cb) => {
-    cb(null, file.originalname)
+  destination: "./client/public/uploads/imagesPost",
+
+  filename: (req, file, cb) => {
+    const name = file.originalname.split(' ').join('_');
+ 
+    cb(null,  Date.now() + name);
   },
 });
 const upload = multer({
-  storage :Storage
-}).single("testImage")
+  storage: Storage,
+}).single("testImage");
 
+const upload2 = multer ({
+  storage: Storage,
+}).single('testImage2')
 
 module.exports.readPostAll = (req, res) => {
   PostModel.find((err, docs) => {
@@ -43,14 +51,11 @@ module.exports.createPost = async (req, res) => {
         description: req.body.description,
         city: req.body.city,
         country: req.body.country,
-        images: {
-          data: req.file.filename,
-          contentType: "image/png",
-        },
+        images: ` ${req.file.filename}`
       });
       newPost
         .save()
-        .then(() => res.send("succesfully uploaded"))
+        .then(() => res.send(newPost))
         .catch((err) => console.log(err));
     }
   });
@@ -71,13 +76,27 @@ module.exports.createPost = async (req, res) => {
 };
 
 module.exports.modifyPost = async (req, res) => {
-  PostModel.updateOne(
-    { _id: req.params.id },
-    { ...req.body, _id: req.params.id }
-  )
-    .then(() => res.status(200).send(req.body))
-    .catch((error) => res.status(400).json({ error }));
-};
+  upload2(req, res,(err) => {
+    if (err) {
+      console.log(err);
+    } else{
+      const postObject = req.file ? 
+      {
+        // ...JSON.parse(req.body),
+        images : `${req.protocol}://${req.get('host')}./client/public/uploads/imagesPost ${req.file.filename}`
+      } : {...req.body};
+       PostModel.findByIdAndUpdate(
+      { _id: req.params.id },
+      { ...postObject, _id: req.params.id },
+      
+     
+    )
+      .then(() => res.status(200).send(req.body))
+      .catch((error) => res.status(400).json({ error }))}
+   
+  })}
+ 
+
 module.exports.modifyComment = (req, res) => {
   PostModel.updateOne(
     { _id: req.params.id },
@@ -88,12 +107,21 @@ module.exports.modifyComment = (req, res) => {
     .catch((error) => res.status(400).json({ error }));
 };
 module.exports.deletePost = async (req, res) => {
-  PostModel.deleteOne(
-    { _id: req.params.id },
-    { ...req.body, _id: req.params.id }
-  )
-    .then(() => res.status(200).send("post deleted"))
-    .catch((error) => res.status(400).json({ error }));
+PostModel.findOne({_id: req.params.id})
+.then (post => {
+  const filename = post.images.split('./client/public/uploads/imagesPost')[0];
+  console.log(filename);
+  fs.unlink(`./client/public/uploads/imagesPost/${filename}`, () => {
+    PostModel.deleteOne(
+      { _id: req.params.id },
+      { ...req.body, _id: req.params.id }
+    )
+      .then(() => res.status(200).send("post deleted"))
+      .catch((error) => res.status(400).json({ error })); 
+  });
+  
+})
+.catch(error => res.status(400).json({error}))
 };
 
 module.exports.likePost = (req, res) => {

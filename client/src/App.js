@@ -1,21 +1,32 @@
-import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import Home from "./pages/Home";
-import Profil from "./pages/Profil";
-import Trending from "./pages/Trending";
+import React, { useEffect, useState } from "react";
+import Routes from "./components/Routes/index";
+import { UidContext } from "./components/AppContext";
+import axios from "axios";
 
-const App= () => {
+
+const App = () => {
+  const [uid, setUid] = useState(null);
+
+  useEffect( () => {
+    const fetchToken = async () => {
+      await axios({
+        method: "get",
+        url: `${process.env.REACT_APP_API_URL}jwtid`,
+         withCredentials: true,
+      })
+        .then((res) =>{
+           console.log(res);
+          setUid(res.data)
+
+          })
+        .catch((err) => console.log("no"));
+    };
+    fetchToken();
+  },[]);
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/profil" element={<Profil />} />
-        <Route path="/trending" element={<Trending />} />
-        {/* PERMET D ALLER A L ACCUEIL SI L URL EST MAL TAPER */}
-        <Route path="*" element={<Home/>} />
-      </Routes>
-    </BrowserRouter>
+    <UidContext.Provider value={uid}>
+      <Routes />
+    </UidContext.Provider>
   );
 };
 export default App;
-

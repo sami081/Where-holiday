@@ -12,7 +12,7 @@ const app = express();
 //PERSONNE QUI A LE DROIT DE FAIRE LA REQUETTE AU BACK
 const corsOption = {
   origin : process.env.CLIENT_URL,
-  Credential : true,
+  Credential:true,
   'allowedHeaders' : ['sessionId', 'Content-Type'],
   'exposedHeaders' : ['sessionId'],
   'methods' : 'GET, HEAD, PUT, PATCH, POST, DELETE',

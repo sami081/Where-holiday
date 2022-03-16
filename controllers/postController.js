@@ -13,16 +13,14 @@ const Storage = multer.diskStorage({
   filename: (req, file, cb) => {
     const name = file.originalname.split(' ').join('_');
  
-    cb(null,  Date.now() + name);
+    cb(null, name);
   },
 });
 const upload = multer({
   storage: Storage,
 }).single("testImage");
 
-const upload2 = multer ({
-  storage: Storage,
-}).single('testImage2')
+
 
 module.exports.readPostAll = (req, res) => {
   PostModel.find((err, docs) => {
@@ -51,7 +49,7 @@ module.exports.createPost = async (req, res) => {
         description: req.body.description,
         city: req.body.city,
         country: req.body.country,
-        images: ` ${req.file.filename}`
+        images: `${req.file.filename}`
       });
       newPost
         .save()
@@ -76,15 +74,17 @@ module.exports.createPost = async (req, res) => {
 };
 
 module.exports.modifyPost = async (req, res) => {
-  upload2(req, res,(err) => {
+  upload(req, res,(err) => {
     if (err) {
       console.log(err);
     } else{
       const postObject = req.file ? 
       {
         // ...JSON.parse(req.body),
-        images : `${req.protocol}://${req.get('host')}./client/public/uploads/imagesPost ${req.file.filename}`
+        
+        images : `${req.file.filename}`
       } : {...req.body};
+      
        PostModel.findByIdAndUpdate(
       { _id: req.params.id },
       { ...postObject, _id: req.params.id },
@@ -111,7 +111,7 @@ PostModel.findOne({_id: req.params.id})
 .then (post => {
   const filename = post.images.split('./client/public/uploads/imagesPost')[0];
   console.log(filename);
-  fs.unlink(`./client/public/uploads/imagesPost/${filename}`, () => {
+  fs.unlink(`./client/public/uploads/imagesPost ${filename}`, () => {
     PostModel.deleteOne(
       { _id: req.params.id },
       { ...req.body, _id: req.params.id }

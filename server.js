@@ -12,7 +12,7 @@ const app = express();
 //PERSONNE QUI A LE DROIT DE FAIRE LA REQUETTE AU BACK
 const corsOption = {
   origin : process.env.CLIENT_URL,
-  Credential:true,
+  credentials:true,
   'allowedHeaders' : ['sessionId', 'Content-Type'],
   'exposedHeaders' : ['sessionId'],
   'methods' : 'GET, HEAD, PUT, PATCH, POST, DELETE',
@@ -29,6 +29,7 @@ app.use(express.static(path.join(__dirname, "public")));
 //jwt
 app.get("*", checkUser);
 app.get("/jwtid", requireAuth, (req, res) => {
+  console.log('le back');
   res.status(200).send(res.locals.user._id);
 });
 

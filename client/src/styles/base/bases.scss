@@ -1,0 +1,23 @@
+* {
+ 
+  margin: 0;
+  padding: 0;
+  text-decoration: none;
+  list-style-type: none;
+}
+.button{
+  cursor: pointer;
+  background: lightgray;
+  border-radius: 0.5em;
+  width: 10em;
+  height: 2em;
+}
+body{
+  min-width: 320px;
+  background: lightblue;
+}
+li{
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}

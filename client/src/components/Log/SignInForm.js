@@ -1,29 +1,24 @@
 import React, { useState } from "react";
 import axios from "axios";
 
-
 const SignInForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
   const handleLogin = (e) => {
-    //ne recharge pas la page
     e.preventDefault();
     const emailError = document.querySelector(".email-error");
     const passwordError = document.querySelector(".password-error");
-
     axios({
-      method: "POST",
+      method: "post",
       url: `${process.env.REACT_APP_API_URL}api/user/login`,
-     withCredentials:false,
+      withCredentials: true,
       data: {
         email,
         password,
       },
-      
     })
       .then((res) => {
-        console.log(res);
         if (res.data.errors) {
           emailError.innerHTML = res.data.errors.email;
           passwordError.innerHTML = res.data.errors.password;
@@ -31,14 +26,11 @@ const SignInForm = () => {
           window.location = "/";
         }
       })
-      .catch((err) => {
-        console.log(err);
-      });
+      .catch((err) => console.log(err));
   };
   return (
-    <form action="" onSubmit={handleLogin} id="sign-up-form">
-      <label htmlFor="email">Email</label>
-      <br />
+    <form action="" onSubmit={handleLogin} id="sign-up-form" className="form size-form">
+      <label htmlFor="email">Email :</label>
       <input
         type="email"
         name="email"
@@ -46,10 +38,8 @@ const SignInForm = () => {
         onChange={(e) => setEmail(e.target.value)}
         value={email}
       />
-      <div className="email-error"></div>
-      <br />
-      <label htmlFor="password">Mot de passe</label>
-      <br />
+      <p className="email-error"></p>
+      <label htmlFor="password">Mot de passe :</label>
       <input
         type="password"
         name="password"
@@ -57,9 +47,8 @@ const SignInForm = () => {
         onChange={(e) => setPassword(e.target.value)}
         value={password}
       />
-      <div className="password-error"></div>
-      <br />
-      <input type="submit" value="Se connecter" />
+      <p className="password-error"></p>
+      <input type="submit" value="se connecter" className="button" />
     </form>
   );
 };

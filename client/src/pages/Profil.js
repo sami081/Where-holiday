@@ -1,6 +1,7 @@
 import React, {useContext} from "react";
 import Log from "../components/Log/index";
 import {UidContext} from "../components/AppContext"
+import UpadteProfil from "../components/Profil/UpadteProfil";
 const Profil = () => {
   const uid = useContext(UidContext)
   return (
@@ -8,7 +9,7 @@ const Profil = () => {
     
     <section className="profil-page">
      {uid ? (
-       <h1>UPDATE PAGE</h1>
+    < UpadteProfil />
      ) : (
        
      

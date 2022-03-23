@@ -1,38 +1,37 @@
 import React, { useContext } from "react";
+import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 import { UidContext } from "./AppContext";
 import Logout from "./Log/Logout";
+import ProfilNavbar from "./ProfilNavbar";
 
 const Navbar = () => {
-  const uid = useContext(UidContext)
+  const uid = useContext(UidContext);
+  const userData = useSelector((state) => state.userReducer);
+
   return (
     <header>
-      
-        <div className="logo">
-          <NavLink exact to="/">
-            <img src="./img/icon.png" alt="icone" />
-          </NavLink>
-          <h1>Nom du site</h1>
-        </div>
-        {uid ? (
-          <ul>
-            <li className="welcome">
-              <NavLink exact to ="/profil" >
-                <p>Bienvenue 'valeur dynamique'</p>
-              </NavLink>
-            </li>
-            <Logout />
-          </ul>
-        ) : (
-          <ul>
-            <li >
-              <NavLink exact to='/profil'>
-                <img src="./img/icons/login.png" alt="login" className="login" />
-              </NavLink>
-            </li>
-          </ul>
-        )}
-      
+      <NavLink exact to="/">
+        <img src="./img/icon.png" alt="icon" />
+      </NavLink>
+
+      {uid ? (
+        <NavLink exact to="/profil" className="nav-profil">
+          <p className="pseudo">{userData.pseudo}</p>
+          <div>
+          <ProfilNavbar />
+          </div>
+          <Logout />
+        </NavLink>
+      ) : (
+        <NavLink exact to="/profil">
+          <img
+            src="./img/icons/icon-connexion.jpg"
+            alt="icon-dec"
+            className="icon-connexion"
+          />
+        </NavLink>
+      )}
     </header>
   );
 };

@@ -1,10 +1,17 @@
-import React from 'react';
-
+import React, { useContext } from 'react';
+import SignInForm from '../components/Log/SignInForm';
+import { UidContext } from '../components/AppContext';
 const Home = () => {
+  const uid = useContext(UidContext);
   return (
-    <div>
-      home
-    </div>
+  <div>
+{uid ? (
+"POST"
+) : (
+  <SignInForm />
+)}
+  </div>
+   
   );
 };
 

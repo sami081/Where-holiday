@@ -12,16 +12,27 @@ module.exports.getOneUser = async (req, res) => {
   UserModel.findById(req.params.id, (err, docs) => {
     if (!err) res.send(docs);
     else console.log("ID unknown : " + err);
-  }).select("-password, -_id");
+  }).select("-password");
 };
 
 module.exports.modifyUser = async (req, res) => {
-  UserModel.updateOne(
+  if (!ObjectID.isValid(req.params.id))
+  return res.status(400).send("ID unknown : " + req.params.id);
+
+try {
+  await UserModel.findOneAndUpdate(
     { _id: req.params.id },
-    { ...req.body, _id: req.params.id }
-  )
-    .then(() => res.status(200).send(req.body))
-    .catch((error) => res.status(400).json({ error }));
+    {
+      $set: {
+        bio: req.body.bio,
+      },
+    },
+    { new: true, upsert: true, setDefaultsOnInsert: true })
+    .then((data) => res.send(data))
+    .catch((err) => res.status(500).send({ message: err }));
+} catch (err) {
+  return res.status(500).json({ message: err });
+}
 };
 
 module.exports.deleteUser = async (req, res) => {

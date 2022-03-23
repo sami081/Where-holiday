@@ -1,0 +1,30 @@
+@media only screen and (max-width: 520px){
+header {
+  display: flex;
+  justify-content: space-around;
+  padding: 10px;
+  align-items: center;
+  .icon-connexion {
+    width: 2em;
+  }
+  a{
+    display: flex;
+    img{
+      width: 2em;
+      height: 2em;
+    }
+  }
+  .nav-profil {
+    display: flex;
+    align-items: center;
+    width: 75%;
+    justify-content: space-around;
+  }
+  .pseudo {
+    font-weight: bolder;
+    color: white;
+    font-size: 1em;
+  }
+  
+}
+}

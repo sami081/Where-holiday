@@ -15,7 +15,13 @@
       align-items: center;
       width: 100%;
       justify-content: space-around;
-      height: 600px;
+      height: 300px;
+      .form-email{
+        display: flex;
+        flex-direction: column;
+        justify-content: space-around;
+        height: 100px;
+      }
       .img-profil {
         display: flex;
         height: auto;
@@ -28,6 +34,18 @@
         background: beige;
         border-radius: 0.8em;
         text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      
+      }
+      .email {
+        width: auto;
+        height: auto;
+        background: beige;
+        border-radius: 0.8em;
+        padding: 5px;
+       ;
       }
       button {
         cursor: pointer;

@@ -1,8 +1,10 @@
 const router = require("express").Router();
 const authController = require("../controllers/authController");
 const userController = require("../controllers/userController");
-const uploadController = require('../controllers/uploadController')
-// const multer = require ('multer');
+const uploadController = require("../controllers/uploadController");
+const multer = require("multer");
+const upload = multer();
+
 // const User = require('../models/userModel')
 // //upload
 // const storage = multer.diskStorage({
@@ -21,10 +23,6 @@ const uploadController = require('../controllers/uploadController')
 //   }
 // })
 
-
-
-
-
 // auth
 router.post("/register", authController.signUp);
 router.post("/login", authController.signIn);
@@ -36,9 +34,6 @@ router.get("/:id", userController.getOneUser);
 router.put("/:id", userController.modifyUser);
 router.delete("/:id", userController.deleteUser);
 
-
-
-
-
+router.post("/upload", upload.single("file"), uploadController.uploadProfil);
 
 module.exports = router;

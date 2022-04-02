@@ -2,23 +2,10 @@ const PostModel = require("../models/postModel");
 const UserModel = require("../models/userModel");
 const { uploadErrors } = require("../utils/errorsUtils");
 const ObjectID = require("mongoose").Types.ObjectId;
-const multer = require("multer");
+
 const fs = require ('fs')
 
 
-//stokage image
-const Storage = multer.diskStorage({
-  destination: "./client/public/uploads/imagesPost",
-
-  filename: (req, file, cb) => {
-    const name = file.originalname.split(' ').join('_');
- 
-    cb(null, name);
-  },
-});
-const upload = multer({
-  storage: Storage,
-}).single("testImage");
 
 
 
